@@ -18,13 +18,10 @@ class SUBMARINESIM_API UPeriscopeOverlayUI : public UUserWidget
     GENERATED_BODY()
 
 public:
-    UFUNCTION()
-    void OnDistanceInputChanged(const FText& Text);
-
     UPROPERTY(BlueprintReadOnly)
     UTorpedoLauncher* TorpedoLauncher;
 
-    // Periscope Camera (assigned by the PlayerController or elsewhere)
+    // Periscope Camera (assigned by the PlayerController)
     UPROPERTY(BlueprintReadOnly, Category = "Periscope", meta = (AllowPrivateAccess = "true"))
     UCameraComponent* PeriscopeCamera;
 
@@ -43,6 +40,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Periscope")
     void MeasureDistance();
+
+    UFUNCTION()
+    void OnDistanceInputChanged(const FText& Text);
 
     // Function to select a torpedo pipe
     UFUNCTION()
@@ -63,10 +63,11 @@ protected:
     void OnTorpedoPipeButtonClicked();
 
 private:
-
-
     // Boolean array to keep track of selected pipes
     TArray<bool> TorpedoPipesSelected;
+
+    // Array to store button indices
+    TArray<int32> TorpedoPipeButtonIndices;
 
     // Editable text box for distance input
     UPROPERTY(meta = (BindWidget))
@@ -81,7 +82,4 @@ private:
     // Text block for distance warning
     UPROPERTY(meta = (BindWidget))
     UTextBlock* DistanceWarningText;
-
-    // Array to store button indices
-    TArray<int32> TorpedoPipeButtonIndices;
 };
