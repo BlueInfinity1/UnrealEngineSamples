@@ -9,14 +9,14 @@
 #include "EngineUtils.h"
 
 
-// Note: This code dynamically assigns TorpedoPipeButtons and TorpedoPipeTextBlocks
-// because elements assigned through Blueprints may be lost during compilation or edits. 
-// The workaround avoids reliance on Blueprint bindings by programmatically finding
-// widgets by name at runtime.
+// Note: This code dynamically assigns TorpedoPipeButtons and TorpedoPipeTextBlocks because elements
+// assigned through Blueprints may be lost during compilation or edits due to a bug in Unreal Engine.
+// The workaround avoids reliance on Blueprint bindings by programmatically finding widgets
+// by name at runtime.
 
-// Special Case: The first text block uses the name "SelectedText" (without a "_1" suffix),
-// while subsequent text blocks use "SelectedText_1", "SelectedText_2", etc. This naming
-// pattern is handled here to ensure all elements are dynamically assigned correctly.
+// Due to how UE's object duplication works in the editor, the first text block uses the name "SelectedText"
+// (without a "_1" suffix), while subsequent text blocks use "SelectedText_1", "SelectedText_2", etc.
+// This naming pattern is handled here to ensure all elements are dynamically assigned correctly.
 
 void UPeriscopeOverlayUI::NativeConstruct()
 {
@@ -80,12 +80,11 @@ void UPeriscopeOverlayUI::NativeConstruct()
     if (MeasureDistanceButton)
     {
         MeasureDistanceButton->OnClicked.AddDynamic(this, &UPeriscopeOverlayUI::MeasureDistance);
-	}
-	else
-	{
+    }
+    else
+    {
 		UE_LOG(LogTemp, Warning, TEXT("MeasureDistanceButton is not assigned!"));
-	}
-
+    }
 
     // Clear the arrays to avoid duplicates if this is called more than once
     TorpedoPipeButtons.Empty();
@@ -161,8 +160,8 @@ void UPeriscopeOverlayUI::NativeConstruct()
         IsSelected = true;
     }
 
-    //DEBUG:
-//	TorpedoPipesSelected[0] = true;
+    // DEBUG LINE, UNCOMMENT FOR QUICKER TESTING
+	// TorpedoPipesSelected[0] = true;
 
     // Bind click events for all buttons
     for (int32 Index = 0; Index < TorpedoPipeButtons.Num(); ++Index)
@@ -232,7 +231,7 @@ void UPeriscopeOverlayUI::MeasureDistance()
         }
     }
 
-    // Update DistanceInput based on whether a closest enemy was found
+    // Update DistanceInput input field based on whether a closest enemy was found
     if (ClosestEnemy)
     {
         // Convert the distance to meters
@@ -248,8 +247,7 @@ void UPeriscopeOverlayUI::MeasureDistance()
             // Call the OnDistanceInputChanged function manually with the updated text
             OnDistanceInputChanged(FormattedDistanceText);
 
-            //UE_LOG(LogTemp, Log, TEXT("Closest enemy ship '%s' is at a distance of %.2f meters."),
-            //    *ClosestEnemy->GetActorLabel(), DistanceInMeters);
+            UE_LOG(LogTemp, Log, TEXT("Closest enemy ship '%s' is at a distance of %.2f meters."), *ClosestEnemy->GetActorLabel(), DistanceInMeters);
         }
     }
     else
@@ -268,12 +266,6 @@ void UPeriscopeOverlayUI::MeasureDistance()
         }
     }
 }
-
-
-
-
-
-
 
 // Method for handling button clicks
 void UPeriscopeOverlayUI::OnTorpedoPipeButtonClicked()
@@ -334,15 +326,12 @@ void UPeriscopeOverlayUI::SelectTorpedoPipe(int PipeIndex)
     }
 }
 
-
 void UPeriscopeOverlayUI::OnDistanceInputChanged(const FText& Text)
-{
-    //UE_LOG(LogTemp, Warning, TEXT("OnDistanceInputChanged triggered."));
-
+{    
     float Distance = FCString::Atof(*Text.ToString());
     if (Distance > 5000.0f)
     {
-        DistanceWarningText->SetText(FText::FromString("Warning: Distance exceeds 5000!"));
+        DistanceWarningText->SetText(FText::FromString("Warning: Distance of the enemy ship exceeds 5000 meters!"));
     }
     else
     {
@@ -350,7 +339,7 @@ void UPeriscopeOverlayUI::OnDistanceInputChanged(const FText& Text)
     }
 }
 
-
+// TODO: Refactor so that LaunchTorpedoes() and LaunchSingleTorpedo() are in their own separate class that could be named "TorpedoLauncher"
 void UPeriscopeOverlayUI::LaunchTorpedoes()
 {
     if (!TorpedoLauncher)
@@ -366,7 +355,7 @@ void UPeriscopeOverlayUI::LaunchTorpedoes()
     }
 
     // Get input values
-    float Distance = DistanceInput ? FCString::Atof(*DistanceInput->GetText().ToString()) * 100.0f : 1000.0f; // Convert to UE units
+    float Distance = DistanceInput ? FCString::Atof(*DistanceInput->GetText().ToString()) * 100.0f : 1000.0f; // Convert to UE units (100 UE units = 1 meter)
     UE_LOG(LogTemp, Log, TEXT("LaunchTorpedoes: Retrieved DistanceInput = %s (%.2f UE Units)"), *DistanceInput->GetText().ToString(), Distance);
 
     float TargetSpeed = SpeedInput ? FCString::Atof(*SpeedInput->GetText().ToString()) * 100.0f : 0.0f; // Convert to UE units
@@ -378,7 +367,7 @@ void UPeriscopeOverlayUI::LaunchTorpedoes()
         UE_LOG(LogTemp, Warning, TEXT("Invalid Distance! Defaulting to 1000."));
     }
 
-    // Torpedo speed in UE units per second
+    // Torpedo speed in UE units per second (15.43 m/s)
     float TorpedoSpeed = 1543.0f;
 
     // Calculate the time it will take for the torpedo to reach the target
@@ -465,7 +454,7 @@ void UPeriscopeOverlayUI::LaunchSingleTorpedo(int32 PipeIndex, FVector TargetFut
 {
 	UE_LOG(LogTemp, Log, TEXT("Launching torpedo from pipe %d"), PipeIndex);
     // Torpedo speed in UE units per second
-    float TorpedoSpeed = 1543.0f;
+    float TorpedoSpeed = 1543.0f; // TODO: Refactor, as this is redundant and should be fetched from a centralized location
 
     if (TorpedoLauncher && TorpedoLauncher->SpawnPoints.IsValidIndex(PipeIndex))
     {
@@ -505,16 +494,3 @@ void UPeriscopeOverlayUI::LaunchSingleTorpedo(int32 PipeIndex, FVector TargetFut
         UE_LOG(LogTemp, Warning, TEXT("Invalid spawn point for pipe %d"), PipeIndex);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
