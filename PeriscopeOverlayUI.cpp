@@ -8,7 +8,6 @@
 #include "TorpedoLauncher.h"
 #include "EngineUtils.h"
 
-
 // Note: This code dynamically assigns TorpedoPipeButtons and TorpedoPipeTextBlocks because elements
 // assigned through Blueprints may be lost during compilation or edits due to a bug in Unreal Engine.
 // The workaround avoids reliance on Blueprint bindings by programmatically finding widgets
@@ -292,7 +291,6 @@ void UPeriscopeOverlayUI::OnTorpedoPipeButtonClicked()
     }
 }
 
-
 void UPeriscopeOverlayUI::SelectTorpedoPipe(int PipeIndex)
 {
     if (TorpedoPipesSelected.IsValidIndex(PipeIndex))
@@ -448,7 +446,6 @@ void UPeriscopeOverlayUI::LaunchTorpedoes()
         }
     }
 }
-
 
 void UPeriscopeOverlayUI::LaunchSingleTorpedo(int32 PipeIndex, FVector TargetFutureLocation)
 {
