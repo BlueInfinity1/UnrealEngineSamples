@@ -1,6 +1,6 @@
 # Unreal Engine C++ Samples: Periscope View & Torpedo Launching
 
-This repository contains sample C++ code from an Unreal Engine 5 prototype project demonstrating a periscope UI for targeting and launching torpedoes in 3D environment with a submarine. The implementation showcases dynamic UI element functionality, real-time enemy distance measurement, and predictive projectile path calculation.
+This repository contains sample C++ code from an Unreal Engine 5 prototype project demonstrating a periscope UI for targeting and launching torpedoes in a 3D environment with a submarine. The implementation showcases dynamic UI element functionality, real-time enemy distance measurement, and predictive projectile path calculation.
 
 ## Video Demonstration
 
